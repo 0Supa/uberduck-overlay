@@ -1,6 +1,6 @@
 const ttsServer = io('', {
     path: '/tts/socket.io',
-    transports: ["websocket", "polling"]
+    transports: ["websocket"]
 })
 
 const params = new URLSearchParams(window.location.search);
