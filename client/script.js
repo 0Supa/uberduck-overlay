@@ -1,4 +1,4 @@
-const ttsServer = io('/kazittsxd')
+const ttsServer = io('/', { 'path': '/kazittsxd/socket.io' })
 
 const voices = {
     "6d59b12f-b04d-4d0d-a69e-a49e8068e9e0": "spongebob",
