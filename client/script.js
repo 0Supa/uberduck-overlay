@@ -1,14 +1,9 @@
-const ttsServer = io('/', { 'path': '/kazittsxd/socket.io' })
+const ttsServer = io('/', { 'path': '/tts/socket.io' })
 
-const voices = {
-    "6d59b12f-b04d-4d0d-a69e-a49e8068e9e0": "spongebob",
-    "7d1418e9-82f4-4c53-9735-f549034baeed": "kendrick-lamar",
-    "0dad1f1d-9a88-4d07-b394-33eb5e9acd60": "albert-einstein",
-    "4d0a1f7b-3c4e-4b97-bf6d-685bbd97239a": "arthur-morgan",
-    "4635dd41-2054-45ba-aa00-ed06e342bdfb": "alexa"
-}
+const params = new URLSearchParams(window.location.search);
+const channelId = params.get('channel_id')
+if (!channelId) throw new Error('"channel_id" param is required');
 
-const channelId = "108311159" // kazimir33
 let ping
 const queue = []
 
@@ -97,12 +92,11 @@ pubsub.addEventListener('message', ({ data }) => {
 
             const redemption = msgData.data.redemption
 
-            const voice = voices[redemption.reward.id]
             const text = redemption.user_input
 
-            if (!voice || !text) return
+            if (!text) return
 
-            ttsServer.emit('tts', { voice, text })
+            ttsServer.emit('tts', { channelId, rewardId: redemption.reward.id, text })
             break
         }
 
