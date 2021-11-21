@@ -1,0 +1,7 @@
+{
+    "port": 3000,
+    "uberduck": {
+        "key": "uberduck.ai API key",
+        "secret": "uberduck.ai API secret"
+    }
+}
