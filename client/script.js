@@ -1,4 +1,4 @@
-const ttsServer = io('/', { 'path': '/tts/socket.io' })
+const ttsServer = io('/tts/socket.io')
 
 const params = new URLSearchParams(window.location.search);
 const channelId = params.get('channel_id')
