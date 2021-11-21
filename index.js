@@ -5,7 +5,7 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http, { path })
 const uberduck = require('./uberduck')
 
-app.use('/', express.static(__dirname + '/client'))
+app.use(path, express.static(__dirname + '/client'))
 
 io.on('connection', (socket) => {
     socket.on('tts', async tts => {
