@@ -2,7 +2,7 @@ const { port, path } = require('./config.json')
 const express = require('express')
 const app = express()
 const http = require('http').Server(app)
-const io = require('socket.io')(http, { path })
+const io = require('socket.io')(http, { path: `${path}/socket.io` })
 const uberduck = require('./uberduck')
 
 app.use(path, express.static(__dirname + '/client'))
