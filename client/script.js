@@ -1,4 +1,4 @@
-const ttsServer = io('', {
+const ttsServer = io('/', {
     path: '/tts/socket.io',
     transports: ["websocket"]
 })
