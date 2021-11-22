@@ -15,8 +15,10 @@ exports.getResult = async (uuid) => {
     while (true) {
         await sleep(1000)
         const result = await check(uuid)
+
         if (result.path) return result
-        if (Date.parse(result.started_at) > Date.now() - 600000) return
+        if (result.failed_at) throw `TTS Failed: ${uuid} [${JSON.stringify(result)}]`
+        if (Date.parse(result.started_at) > Date.now() - 600000) throw `TTS Took to much to process: ${uuid} [${JSON.stringify(result)}]`
     }
 }
 
