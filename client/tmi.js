@@ -50,7 +50,9 @@ ws.addEventListener('message', ({ data }) => {
 
                 if (flag) {
                     console.log("Skipping TTS")
-                    tts.removeAttribute('src')
+                    queue.shift()
+                    tts.pause()
+                    if (queue.length) playNext()
                 }
                 break;
             }
