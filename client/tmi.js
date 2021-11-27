@@ -37,23 +37,23 @@ ws.addEventListener('message', ({ data }) => {
 
             case "PRIVMSG": {
                 if (msg.params[0] !== `#${channel}` || !msg.params[1]) return;
+                if (msg.params[1].toLowerCase() !== "!skiptts" || typeof (msg.tags.badges) !== 'string') return
 
-                if (msg.params[1].toLowerCase() === "!skiptts" && typeof (msg.tags.badges) === 'string') {
-                    let flag = false;
-                    msg.tags.badges.split(',').forEach(badge => {
-                        badge = badge.split('/');
-                        if (badge[0] === "moderator" || badge[0] === "broadcaster") {
-                            flag = true;
-                            return;
-                        }
-                    });
-
-                    if (flag) {
-                        // TODO skip tts
-                        console.log('skip tts')
+                let flag = false;
+                msg.tags.badges.split(',').forEach(badge => {
+                    badge = badge.split('/');
+                    if (badge[0] === "moderator" || badge[0] === "broadcaster") {
+                        flag = true;
                         return;
                     }
+                });
+
+                if (flag) {
+                    if (!queue.length) return tts.pause()
+                    queue.shift()
+                    playNext()
                 }
+                break;
             }
         }
     }
