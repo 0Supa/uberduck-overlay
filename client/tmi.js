@@ -49,7 +49,8 @@ ws.addEventListener('message', ({ data }) => {
                 });
 
                 if (flag) {
-                    if (!queue.length) return tts.pause()
+                    console.log("Skipping TTS")
+                    if (!queue.length) return tts.setAttribute('src', null)
                     queue.shift()
                     playNext()
                 }
