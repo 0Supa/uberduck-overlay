@@ -3,10 +3,6 @@ const ttsServer = io('', {
     transports: ["websocket"]
 })
 
-const params = new URLSearchParams(window.location.search);
-const channelId = params.get('channel_id')
-if (!channelId) throw new Error('"channel_id" param is required');
-
 let ping
 const queue = []
 
@@ -66,7 +62,7 @@ pubsub.addEventListener('open', () => {
         'type': 'LISTEN',
         'nonce': 'xd',
         'data': {
-            'topics': [`community-points-channel-v1.${channelId}`]
+            'topics': [`community-points-channel-v1.${channel.id}`]
         }
     }
     pubsub.send(JSON.stringify(message))
@@ -99,7 +95,7 @@ pubsub.addEventListener('message', ({ data }) => {
 
             if (!text) return
 
-            ttsServer.emit('tts', { channelId, rewardId: redemption.reward.id, text })
+            ttsServer.emit('tts', { channelId: channel.id, rewardId: redemption.reward.id, text })
             break
         }
 

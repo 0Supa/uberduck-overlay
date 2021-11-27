@@ -1,5 +1,3 @@
-const channel = '8supa'
-
 const ws = new ReconnectingWebSocket('wss://irc-ws.chat.twitch.tv', null, { automaticOpen: false, reconnectInterval: 2000 })
 
 ws.addEventListener('close', () => {
@@ -12,7 +10,7 @@ ws.addEventListener('open', () => {
     ws.send('PASS blah\r\n');
     ws.send('NICK justinfan' + Math.floor(Math.random() * 99999) + '\r\n');
     ws.send('CAP REQ :twitch.tv/commands twitch.tv/tags\r\n');
-    ws.send(`JOIN #${channel}`);
+    ws.send(`JOIN #${channel.login}`);
 })
 
 ws.addEventListener('message', ({ data }) => {
@@ -32,11 +30,11 @@ ws.addEventListener('message', ({ data }) => {
                 break;
 
             case "JOIN":
-                console.log(`Joined channel #${channel}`);
+                console.log(`Joined channel #${channel.login}`);
                 break;
 
             case "PRIVMSG": {
-                if (msg.params[0] !== `#${channel}` || !msg.params[1]) return;
+                if (msg.params[0] !== `#${channel.login}` || !msg.params[1]) return;
                 if (msg.params[1].toLowerCase() !== "!skiptts" || typeof (msg.tags.badges) !== 'string') return
 
                 let flag = false;
