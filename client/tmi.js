@@ -1,23 +1,22 @@
-const ws = new ReconnectingWebSocket('wss://irc-ws.chat.twitch.tv', null, { automaticOpen: false, reconnectInterval: 2000 })
+const tmi = new ReconnectingWebSocket('wss://irc-ws.chat.twitch.tv', null, { automaticOpen: false, reconnectInterval: 2000 })
 
-ws.addEventListener('close', () => {
+tmi.addEventListener('close', () => {
     console.log('Chat Disconnected')
 })
 
-ws.addEventListener('open', () => {
+tmi.addEventListener('open', () => {
     console.log(`Connected to Chat`)
 
-    ws.send('PASS blah\r\n');
-    ws.send('NICK justinfan' + Math.floor(Math.random() * 99999) + '\r\n');
-    ws.send('CAP REQ :twitch.tv/commands twitch.tv/tags\r\n');
-    ws.send(`JOIN #${channel.login}`);
+    tmi.send('PASS blah\r\n');
+    tmi.send(`NICK justinfan${Math.floor(Math.random() * 99999)}\r\n`);
+    tmi.send('CAP REQ :twitch.tv/commands twitch.tv/tags\r\n');
+    tmi.send(`JOIN #${channel.login}`);
 })
 
-ws.addEventListener('message', ({ data }) => {
+tmi.addEventListener('message', ({ data }) => {
     const messages = data.split('\r\n')
 
-    const l = messages.length
-    for (let i = 0; i < l; i++) {
+    for (let i = 0; i < messages.length; i++) {
         const line = messages[i]
         if (!line) return
 
@@ -34,8 +33,7 @@ ws.addEventListener('message', ({ data }) => {
                 break;
 
             case "PRIVMSG": {
-                if (msg.params[0] !== `#${channel.login}` || !msg.params[1]) return;
-                if (msg.params[1].toLowerCase() !== "!skiptts" || typeof (msg.tags.badges) !== 'string') return
+                if (msg.params[0] !== `#${channel.login}` || !msg.params[1] || msg.params[1].toLowerCase() !== "!skiptts" || typeof (msg.tags.badges) !== 'string') return;
 
                 let flag = false;
                 msg.tags.badges.split(',').forEach(badge => {
@@ -58,4 +56,4 @@ ws.addEventListener('message', ({ data }) => {
     }
 })
 
-ws.open()
+tmi.open()
