@@ -3,10 +3,12 @@ const express = require('express')
 const app = express()
 const http = require('http').Server(app)
 const io = require('socket.io')(http, { path: `/tts/socket.io` })
+const minify = require('express-minify');
 const Redis = require("ioredis");
 const redis = new Redis();
 const uberduck = require('./uberduck')
 
+app.use(minify())
 app.use('/tts', express.static(__dirname + '/client'))
 
 io.on('connection', (socket) => {
