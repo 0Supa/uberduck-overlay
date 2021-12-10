@@ -27,10 +27,10 @@ const parseIRC = (data) => {
 
         for (var i = 0; i < rawTags.length; i++) {
             // Tags delimited by an equals sign are key=value tags.
-            // If there's no equals, we assign the tag a value of true.
+            // If there's no equals, we assign the tag a value of null.
             var tag = rawTags[i]
             var pair = tag.split('=')
-            message.tags[pair[0]] = pair[1] || true
+            message.tags[pair[0]] = pair[1] || null
         }
 
         position = nextspace + 1

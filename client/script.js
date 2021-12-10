@@ -5,6 +5,7 @@ const ttsServer = io('', {
 
 let ping
 const queue = []
+const ignoredUsers = new Set()
 
 const tts = document.getElementById('tts')
 
@@ -90,10 +91,9 @@ pubsub.addEventListener('message', ({ data }) => {
             if (msgData.type !== "reward-redeemed") return
 
             const redemption = msgData.data.redemption
-
             const text = redemption.user_input
 
-            if (!text) return
+            if (ignoredUsers.has(redemption.user.id) || !text) return
 
             ttsServer.emit('tts', { channelId: channel.id, rewardId: redemption.reward.id, text })
             break

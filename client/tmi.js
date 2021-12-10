@@ -1,3 +1,4 @@
+const commandPrefix = '!'
 const tmi = new ReconnectingWebSocket('wss://irc-ws.chat.twitch.tv', null, { automaticOpen: false, reconnectInterval: 2000 })
 
 tmi.addEventListener('close', () => {
@@ -25,7 +26,7 @@ tmi.addEventListener('message', ({ data }) => {
 
         switch (msg.command) {
             case "PING":
-                socket.send(`PONG ${msg.params[0]}`);
+                tmi.send(`PONG ${msg.params[0]}`);
                 break;
 
             case "JOIN":
@@ -33,23 +34,17 @@ tmi.addEventListener('message', ({ data }) => {
                 break;
 
             case "PRIVMSG": {
-                if (msg.params[0] !== `#${channel.login}` || !msg.params[1] || msg.params[1].toLowerCase() !== "!skiptts" || typeof (msg.tags.badges) !== 'string') return;
+                if (msg.params[0] !== `#${channel.login}` || !msg.params[1] || !msg.params[1].startsWith(commandPrefix) || !msg.tags.badges) return;
+                if (!msg.tags.mod && !msg.tags.badges.split(',').includes('broadcaster/1')) return;
 
-                let flag = false;
-                msg.tags.badges.split(',').forEach(badge => {
-                    badge = badge.split('/');
-                    if (badge[0] === "moderator" || badge[0] === "broadcaster") {
-                        flag = true;
-                        return;
-                    }
-                });
+                const args = msg.params[1].slice(commandPrefix.length).trim().split(/ +/);
+                const commandName = args.shift().toLowerCase();
 
-                if (flag) {
-                    console.log("Skipping TTS")
-                    queue.shift()
-                    tts.pause()
-                    if (queue.length) playNext()
-                }
+                const command = commands[commandName]
+                if (!command) return
+
+                command(args)
+                console.log(`Command "${commandName}" has been executed by "${msg.tags['display-name']}"`)
                 break;
             }
         }
