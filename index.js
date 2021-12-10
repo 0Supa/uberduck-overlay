@@ -13,17 +13,18 @@ app.use('/tts', express.static(__dirname + '/client'))
 
 io.on('connection', (socket) => {
     socket.on('tts', async tts => {
+        if (!tts.channelId || !tts.rewardId || !tts.text) return
+
+        const voice = await redis.hget(`ttsv:${tts.channelId}`, tts.rewardId)
+        if (!voice) return
+
         try {
-            if (!tts.channelId || !tts.rewardId || !tts.text) return
-
-            const voice = await redis.hget(`ttsv:${tts.channelId}`, tts.rewardId)
-            if (!voice) return
-
+            socket.emit('tts generating', { data: tts.data, voice })
             const uuid = await uberduck.queue(voice, tts.text)
             const res = await uberduck.getResult(uuid)
-
             socket.emit('tts result', { url: res.path })
         } catch (err) {
+            socket.emit('tts error', { data: tts.data, voice })
             console.error(err)
         }
     });

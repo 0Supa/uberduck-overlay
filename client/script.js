@@ -3,9 +3,10 @@ const ttsServer = io('', {
     transports: ["websocket"]
 })
 
-let ping
 const queue = []
 const ignoredUsers = new Set()
+
+const toast = siiimpleToast.setOptions({ position: 'bottom|left' });
 
 const tts = document.getElementById('tts')
 
@@ -49,11 +50,20 @@ ttsServer.on('tts result', res => {
     addToQueue(res.url)
 })
 
+ttsServer.on('tts generating', ({ data: user, voice }) => {
+    if (!user || !voice) return
+    toast.message(`⏳ Generating <i>${voice}</i> TTS for <i>${user.display_name}</i>`)
+})
+
+ttsServer.on('tts error', ({ data: user, voice }) => {
+    if (!user || !voice) return
+    toast.alert(`❌ Error while generating <i>${voice}</i> TTS for <i>${user.display_name}</i>`)
+})
+
 const pubsub = new ReconnectingWebSocket('wss://pubsub-edge.twitch.tv', null, { automaticOpen: false })
 
 pubsub.addEventListener('close', () => {
     console.log('PubSub Disconnected')
-    clearInterval(ping)
 })
 
 pubsub.addEventListener('open', () => {
@@ -67,12 +77,6 @@ pubsub.addEventListener('open', () => {
         }
     }
     pubsub.send(JSON.stringify(message))
-
-    ping = setInterval(() => {
-        pubsub.send(JSON.stringify({
-            type: 'PING',
-        }))
-    }, 250 * 1000)
 })
 
 pubsub.addEventListener('message', ({ data }) => {
@@ -95,7 +99,7 @@ pubsub.addEventListener('message', ({ data }) => {
 
             if (ignoredUsers.has(redemption.user.id) || !text) return
 
-            ttsServer.emit('tts', { channelId: channel.id, rewardId: redemption.reward.id, text })
+            ttsServer.emit('tts', { channelId: channel.id, rewardId: redemption.reward.id, text, data: redemption.user })
             break
         }
 
@@ -107,3 +111,9 @@ pubsub.addEventListener('message', ({ data }) => {
 })
 
 pubsub.open()
+
+setInterval(() => {
+    pubsub.send(JSON.stringify({
+        type: 'PING',
+    }))
+}, 250 * 1000)
