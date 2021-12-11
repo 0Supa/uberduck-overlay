@@ -6,7 +6,7 @@ const ttsServer = io('', {
 const queue = []
 const ignoredUsers = new Set()
 
-const toast = siiimpleToast.setOptions({ position: 'bottom|right' });
+const toast = siiimpleToast.setOptions({ position: 'bottom|right', duration: 4000 })
 
 const tts = document.getElementById('tts')
 
