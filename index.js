@@ -18,6 +18,11 @@ io.on('connection', (socket) => {
         const voice = await redis.hget(`ttsv:${tts.channelId}`, tts.rewardId)
         if (!voice) return
 
+        if (voice.startsWith('polly:')) {
+            socket.emit('tts result', { url: `https://api.streamelements.com/kappa/v2/speech?voice=${encodeURIComponent(voice.slice(6))}&text=${encodeURIComponent(tts.text)}` })
+            return
+        }
+
         try {
             socket.emit('tts generating', { data: tts.data, voice })
             const uuid = await uberduck.queue(voice, tts.text)
